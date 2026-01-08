@@ -10,12 +10,16 @@ import Register from "./pages/Register/Register";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 
+//context
+import { AuthProvider } from "./context/AuthContext";
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <AuthProvider>
+        <BrowserRouter>
         <NavBar />
         <div className="container">
           <Routes>
@@ -27,6 +31,7 @@ function App() {
         </div>
         <Footer />
       </BrowserRouter>
+      </AuthProvider>
     </div>
   );
 }
