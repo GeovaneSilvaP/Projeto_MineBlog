@@ -1,20 +1,18 @@
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  updateProfile,
+} from "firebase/auth";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { auth } from "../firebase/config";
 
 export const useAuthentication = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [cancelled, setCancelled] = useState(false);
-
-  function checkIfIsCancelled() {
-    if (cancelled) return;
-  }
 
   const createUser = async (data) => {
-    checkIfIsCancelled();
-
     setLoading(true);
     setError(null);
 
@@ -29,34 +27,59 @@ export const useAuthentication = () => {
         displayName: data.displayName,
       });
 
-      setLoading(false);
       return user;
     } catch (error) {
-      setError(error.message);
-
       let systemErrorMessage;
-      
-      if (error.message.includes("Password")) {
+
+      if (error.code === "auth/weak-password") {
         systemErrorMessage = "A senha precisa ter pelo menos 6 caracteres.";
-      } else if (error.message.includes("email-already")) {
+      } else if (error.code === "auth/email-already-in-use") {
         systemErrorMessage = "E-mail já cadastrado.";
       } else {
-        systemErrorMessage = "Ocorreu um erro, por favor tente mais tarde.";
+        systemErrorMessage = "Ocorreu um erro, tente novamente.";
       }
 
       setError(systemErrorMessage);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
-  useEffect(() => {
-    return () => setCancelled(true);
-  }, []);
+  const login = async (data) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+    } catch (error) {
+      let systemErrorMessage;
+
+      if (error.code === "auth/user-not-found") {
+        systemErrorMessage = "Usuário não encontrado.";
+      } else if (error.code === "auth/wrong-password") {
+        systemErrorMessage = "Senha incorreta.";
+      } else {
+        systemErrorMessage = "E-mail ou senha inválidos.";
+      }
+
+      setError(systemErrorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   return {
-    auth,
     createUser,
+    login,
+    logout,
     error,
     loading,
   };
