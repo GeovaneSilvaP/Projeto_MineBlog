@@ -1,6 +1,5 @@
 import "./App.css";
 
-// pages
 import Home from "./pages/Home/Home";
 import About from "./pages/About/About";
 import Login from "./pages/Login/Login";
@@ -8,21 +7,15 @@ import Register from "./pages/Register/Register";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import CreatePost from "./pages/CreatePost/CreatePost";
 
-// components
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 
-// context
 import { AuthProvider } from "./context/AuthContext";
 
-// router
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
-// firebase
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase/config";
 
-// hooks
 import { useState, useEffect } from "react";
 
 function App() {
