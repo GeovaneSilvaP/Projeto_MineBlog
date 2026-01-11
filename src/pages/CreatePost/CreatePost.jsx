@@ -29,10 +29,11 @@ const CreatePost = () => {
       return;
     }
 
-    // criar array de tags
+    // ✅ criar array de tags CORRETO
     const tagsArray = tags
       .split(",")
-      .map((tag) => tag.trim().toLowerCase());
+      .map((tag) => tag.replace("#", "").trim().toLowerCase())
+      .filter((tag) => tag !== "");
 
     if (!title || !image || !body || tagsArray.length === 0) {
       setFormError("Preencha todos os campos!");
@@ -43,7 +44,7 @@ const CreatePost = () => {
       title,
       image,
       body,
-      tags: tagsArray,
+      tagsArray, // ✅ NOME CORRETO
       uid: user.uid,
       createdBy: user.displayName,
     });

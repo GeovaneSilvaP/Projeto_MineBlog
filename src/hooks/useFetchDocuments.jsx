@@ -8,53 +8,49 @@ import {
   where,
 } from "firebase/firestore";
 
-export const useFetchDocuments = (doCollection, search = null, uid = null) => {
+export const useFetchDocuments = (docCollection, search = null) => {
   const [documents, setDocuments] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(null);
-
-  const [cancelled, setCancelled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function loadData() {
-      if (cancelled) return;
+    setLoading(true);
 
-      setLoading(true);
+    const collectionRef = collection(db, docCollection);
 
-      const collectionRef = await collection(db, doCollection);
+    let q;
 
-      try {
-        let q;
+    if (search) {
+      const searchLower = search.toLowerCase();
 
-        //busca
-        //dashboard
-
-        q = await query(collectionRef, orderBy("createdAt", "desc"));
-
-        await onSnapshot(q, (querySnapshot) => {
-          setDocuments(
-            querySnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }))
-          );
-        });
-
-        setLoading(false);
-      } catch (error) {
-        console.log(error);
-        setError(error.message);
-
-        setLoading(false);
-      }
+      q = query(
+        collectionRef,
+        where("tagsArray", "array-contains", searchLower),
+        orderBy("createdAt", "desc")
+      );
+    } else {
+      q = query(collectionRef, orderBy("createdAt", "desc"));
     }
 
-    loadData();
-  }, [doCollection, search, uid, cancelled]);
+    const unsubscribe = onSnapshot(
+      q,
+      (querySnapshot) => {
+        setDocuments(
+          querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+        );
+        setLoading(false);
+      },
+      (error) => {
+        setError(error.message);
+        setLoading(false);
+      }
+    );
 
-  useEffect(() => {
-    return () => setCancelled(true);
-  }, []);
+    return () => unsubscribe();
+  }, [docCollection, search]);
 
   return {
     documents,
@@ -62,3 +58,4 @@ export const useFetchDocuments = (doCollection, search = null, uid = null) => {
     error,
   };
 };
+
