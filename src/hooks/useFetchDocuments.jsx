@@ -8,7 +8,7 @@ import {
   where,
 } from "firebase/firestore";
 
-export const useFetchDocuments = (docCollection, search = null) => {
+export const useFetchDocuments = (docCollection, search = null, uid = null) => {
   const [documents, setDocuments] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -26,6 +26,12 @@ export const useFetchDocuments = (docCollection, search = null) => {
       q = query(
         collectionRef,
         where("tagsArray", "array-contains", searchLower),
+        orderBy("createdAt", "desc")
+      );
+    }else if(uid){
+      q = query(
+        collectionRef,
+        where("uid", "==", uid),
         orderBy("createdAt", "desc")
       );
     } else {
@@ -58,4 +64,3 @@ export const useFetchDocuments = (docCollection, search = null) => {
     error,
   };
 };
-
