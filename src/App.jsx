@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import CreatePost from "./pages/CreatePost/CreatePost";
 import Search from "./pages/Search/Search";
 import Post from "./pages/Post/Post";
+import EditarPost from "./pages/EditarPost/EditarPost";
 
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
@@ -57,6 +58,11 @@ function App() {
               <Route
                 path="/register"
                 element={!user ? <Register /> : <Navigate to="/" />}
+              />
+
+              <Route
+                path="/posts/edit/:id"
+                element={user ? <EditarPost /> : <Navigate to="/login" />}
               />
 
               <Route
